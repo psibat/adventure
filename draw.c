@@ -1,5 +1,4 @@
 #include "helpers.h"
-#include "constants.h"
 #include "draw.h"
 
 int drawGraphic(char *graphicName) {
@@ -20,33 +19,37 @@ int drawGraphic(char *graphicName) {
 }
 
 int drawMessage(char message[]) {
-    int i = 0;
-    int lineLength = 1;
-    for (i = 0; i < MESSAGE_SIZE && message[i] != ENDS; i++, lineLength++) {   
-        if (message[i] == 10 && message[i + 1] == ENDS) break;
-        printf("%c", message[i]);
+    if (message[0] != 10 && message[0] != ENDS) {
+        printf("%c", message[0]);
         fflush(stdout);
+        int i = 0;
+        int lineLength = 1;
+        for (i = 1; i < MESSAGE_SIZE && message[i] != ENDS; i++, lineLength++) {   
+            switch (message[i]) {
+                case '!':
+                case '.':
+                case '?':
+                    sleepms(300);
+                    break;
+                case NEW_LINE:
+                    sleepms(200);
+                    lineLength = 0;
+                    break;
+                case ',':
+                    sleepms(100);
+                    break;
+            }
 
-        switch (message[i]) {
-            case '!':
-            case '.':
-            case '?':
-                sleepms(300);
-                break;
-            case NEW_LINE:
-                sleepms(200);
-                lineLength = 0;
-                break;
-            case ',':
-                sleepms(100);
-                break;
-        }
+            sleepms(100);
 
-        sleepms(100);
-
-        if (lineLength == LINE_SIZE) {
-            printf("%c", NEW_LINE);
-            lineLength = 0;
+            if (message[i] != 10) {
+                printf("%c", message[i]);
+                fflush(stdout);
+                if (lineLength == LINE_SIZE) {
+                    printf("%c", NEW_LINE);
+                    lineLength = 0;
+                }
+            }
         }
     }
     return 0;
@@ -60,14 +63,14 @@ int drawArrow(bool newLine) {
     return 0;
 }
 
-int draw(void *output, int outputType) { 
+int draw(Output* output) { 
     
-    switch (outputType) {
+    switch (output->type) {
         case DRAW_MESSAGE:
-            drawMessage((char *) output);
+            drawMessage((char *) output->value);
             break;
         case DRAW_GRAPHIC:
-            drawGraphic(output);
+            drawGraphic(output->value);
             break;
         case DRAW_MAP:
             break;

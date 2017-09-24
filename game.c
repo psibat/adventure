@@ -5,66 +5,27 @@
 #include "parser.h"
 #include "draw.h"
 
-void input(char *command) {
-    fgets (command, MESSAGE_SIZE + 1, stdin);
-}
-
-int process(char *command, char **tokens, void **output) {
-    char *message;
-    
-    message = malloc(sizeof(char) * MESSAGE_SIZE + 1);
-    *output = message;
-
-    getTokens(tokens, command);
-
-    strcpy(message, tokens[0]);
-    size_t len = strlen(message);
-    message[len] = NEW_LINE;
-    message[len + 1] = ENDS;
-
-    int i; 
-    for (i = 1; i < COMMAND_SIZE && tokens[i][0] != ENDS; i++) {
-        strcat(message, tokens[i]);
-        len = strlen(message);
-        message[len] = NEW_LINE;
-        message[len + 1] = ENDS;
-    }
-
-    return DRAW_MESSAGE;
-}
-
 int main() {
-    // Pointer to output
-    void *output;
-    // Type of output (how to draw it, @TODO enum)
-    int outputType;
-    // The input as a string
-    char *command = malloc(sizeof(char) * MESSAGE_SIZE + 1);
-    // The input separated into words
-    char **words = malloc(sizeof(char *) * COMMAND_SIZE);
-    // Allocating space for words
-    int i;
-    for (i = 0; i < COMMAND_SIZE; i++) {
-        words[i] = malloc(sizeof(char) * WORD_SIZE + 1);
-    }
+    Output* output = malloc(sizeof(Output));
+    Command* command = malloc(sizeof(Command));
+    loadActions();
 
-    Action *actions = malloc(sizeof(Action) * ACTION_SIZE);
-
-    loadActions(actions);
-
-    printf("%d\n", actions[0].method);
-    printf("%d\n", actions[1].method);
     //clear();
 
     // Load welcome graphic, @TODO Graphic constants
     drawGraphic("welcome");
     drawArrow(false);
 
+    parse(command);
+    printf("Action word: %s\n", command->action->words[0]);
+    printf("Grammar: %d-%d\n", command->grammar[0], command->grammar[1]);
+    printf("Grammar: %d, %d\n", command->action->grammars[0][0], command->action->grammars[0][1]);
+    command->action->method(output, command);
+    drawArrow(false);
     while (true) {
-        input(command);
-        outputType = process(command, words, &output);
-        draw(output, outputType);
-        free(output);
+        parse(command);
+        command->action->method(output, command);
+        draw(output);
     }
 
     return 0;
@@ -92,4 +53,7 @@ int main() {
 //      Action points
 //  Error message
 //      Treat error as command word
+//  Characters
+//      Miss CEO / Missy Ozmand
+//      Prof. Philo Panopolis
 //

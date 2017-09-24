@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -Wno-missing-braces
 DEPS = helpers.h constants.h draw.h parser.h game.h
 OBJ = draw.o parser.o game.o
 
