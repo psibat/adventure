@@ -26,10 +26,9 @@ void parse(Command *command) {
 
     bool validGrammar = false;
     WordType* grammar; 
-    bool loop = true;
     int i, j;
     // Loop through words
-    for(i = 0; i < COMMAND_SIZE+1 && loop; i++) {
+    for(i = 0; i < COMMAND_SIZE+1; i++) {
         words[i+1] = getWord(tokens[i+1], ACTIONS);
 
         if (words[i+1].type == NOTHING) {
@@ -41,9 +40,9 @@ void parse(Command *command) {
         }
 
         // Loop through the grammars checking the type at n[i]
-        for (j = 0; j < GRAMMAR_SIZE && loop; j++) {
+        for (j = 0; j < GRAMMAR_SIZE; j++) {
             if (((Action*) words[0].value)->grammars[j][i] == NOTHING && i == 0) {
-                    break;
+                break;
             } else if (((Action*) words[0].value)->grammars[j][i] == words[i+1].type) {
                 if (((Action*) words[0].value)->grammars[j][i+1] == NOTHING) {
                     validGrammar = true;
@@ -53,6 +52,11 @@ void parse(Command *command) {
         }
     }
 
+    if (!validGrammar) {
+        action = &ACTIONS[ERROR];
+    }
+
+    printf("Valid: %d\n", validGrammar);
     command->action = action;
     command->grammar = grammar;
     memcpy(command->args, words, sizeof(Word) * COMMAND_SIZE);
@@ -103,6 +107,11 @@ Word getWord(char input[], Action action[]) {
     return returnValue;
 }
 
+void doErrorFunc(Output* output, Command* command) {
+    output->type = DRAW_MESSAGE;
+    strcpy(output->value, "Error");
+}
+
 void doFart(Output* output, Command* command) {
     output->type = DRAW_MESSAGE;
     strcpy(output->value, "You fart");
@@ -110,23 +119,24 @@ void doFart(Output* output, Command* command) {
 
 int loadActions() {
  ACTIONS = malloc(sizeof(Action) * ACTION_SIZE);
-    Action look = {
-        .actionID = LOOK,
+    ACTIONS[ERROR] = (Action) {
+        .words = {" ERROR", BLANK},
+        .grammars = -1,
+        .method = &doErrorFunc
+    };
+    ACTIONS[FART] = (Action) {
+        .words = {"fart", BLANK},
+        .grammars = {{LACUNA, -1}, -1},
+        .method = &doFart
+    };
+    ACTIONS[LOOK] = (Action) {
         .words = {"look", "examine", "describe", BLANK },
         .grammars = {
             {OBJECT},
             {LACUNA},
-            {NOTHING},
+            -1,
         },
     };
-    ACTIONS[0] = look;
-    Action fart = {
-        .actionID = FART,
-        .words = {"fart", BLANK},
-        .grammars = {{LACUNA, -1}, {NOTHING, -1}},
-        .method = &doFart
-    };
-    ACTIONS[1] = fart;
 
     return 0;
 }

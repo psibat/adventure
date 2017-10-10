@@ -55,6 +55,11 @@ int drawMessage(char message[]) {
     return 0;
 }
 
+int drawRaw(Output* output) {
+    printf("> ");
+    fflush(stdout);
+}
+
 int drawArrow(bool newLine) {
     if (newLine) printf("%c", NEW_LINE);
     printf("> ");

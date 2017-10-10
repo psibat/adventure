@@ -15,8 +15,8 @@
 
 #define NOTHING -1
 
-#define NEW_LINE '\n'
-#define ENDS '\0'
+#define NEW_LINE (char) '\n'
+#define ENDS (char) '\0'
 #define BLANK ""
-#define SPACE 32
+#define SPACE (char) 32
 #endif

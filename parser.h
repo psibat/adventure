@@ -15,13 +15,13 @@ typedef struct _Command Command;
 typedef enum {LACUNA, ACTION, OBJECT, DIRECTION, SENTENCE, UNKNOWN, WORDTYPE_SIZE} WordType;
 typedef enum {NPC, ITEM} ObjectType;
 typedef enum {
-    LOOK,
+    ERROR,
     FART,
+    LOOK,
     ACTION_SIZE
 } ActionMethod;
 
 struct _Action{
-    ActionMethod actionID;
     char words[DIFF_WORD_OPTIONS][WORD_SIZE];
     WordType grammars[GRAMMAR_SIZE][COMMAND_SIZE];
     void (*method)(Output*, Command*);
@@ -54,7 +54,6 @@ struct _Command{
     Word args[COMMAND_SIZE+1];
     WordType* grammar;
 };
-
 
 extern Action *ACTIONS;
 
